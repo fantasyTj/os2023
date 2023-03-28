@@ -27,7 +27,8 @@ start32:
 	movw $0x18, %ax # setting graphics data segment selector
 	movw %ax, %gs
 	
-	             # TODO: setting esp
+	movl $0x8000, %eax             # TODO: setting esp
+	movl %eax, %esp
 	jmp bootMain # jump to bootMain in boot.c
 
 .p2align 2
