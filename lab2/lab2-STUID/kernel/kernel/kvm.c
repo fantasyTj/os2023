@@ -63,6 +63,16 @@ void loadUMain(void)
 {
 	// TODO: 参照bootloader加载内核的方式
 	void (*uMainEntry)(void);
+	uMainEntry = (void (*)(void))0x200000;
 
-	enterUserSpace(uMainEntry);
+	for (int i = 0; i < 200; i++)
+	{
+		readSect((void *)(uMainEntry + i * 512), 201 + i);
+	}
+
+	struct ELFHeader *eh = (struct ELFHeader *)uMainEntry;
+	unsigned int entry = eh->entry;
+	uMainEntry = (void (*)(void))(uMainEntry + entry);
+
+	enterUserSpace((uint32_t)uMainEntry);
 }

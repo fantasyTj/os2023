@@ -15,32 +15,40 @@ void bootMain(void) {
 }
 */
 
-void bootMain(void) {
+void bootMain(void)
+{
 	int i = 0;
-	int phoff = 0x34;
-	int offset = 0x1000;
+	// int phoff = 0x34;
+	// int offset = 0x1000;
 	unsigned int elf = 0x100000;
 	void (*kMainEntry)(void);
-	kMainEntry = (void(*)(void))0x100000;
+	kMainEntry = (void (*)(void))0x100000;
 
-	for (i = 0; i < 200; i++) {
-		readSect((void*)(elf + i*512), 1+i);
+	for (i = 0; i < 200; i++)
+	{
+		readSect((void *)(elf + i * 512), 1 + i);
 	}
 
 	// TODO: 填写kMainEntry、phoff、offset
+	struct ELFHeader *eh = (struct ELFHeader *)kMainEntry;
+	unsigned int entry = eh->entry;
+	kMainEntry = (void (*)(void))(elf + entry);
 
-	for (i = 0; i < 200 * 512; i++) {
-		*(unsigned char *)(elf + i) = *(unsigned char *)(elf + i + offset);
-	}
+	// for (i = 0; i < 200 * 512; i++) {
+	// 	*(unsigned char *)(elf + i) = *(unsigned char *)(elf + i + offset);
+	// }
 
 	kMainEntry();
 }
 
-void waitDisk(void) { // waiting for disk
-	while((inByte(0x1F7) & 0xC0) != 0x40);
+void waitDisk(void)
+{ // waiting for disk
+	while ((inByte(0x1F7) & 0xC0) != 0x40)
+		;
 }
 
-void readSect(void *dst, int offset) { // reading a sector of disk
+void readSect(void *dst, int offset)
+{ // reading a sector of disk
 	int i;
 	waitDisk();
 	outByte(0x1F2, 1);
@@ -51,7 +59,8 @@ void readSect(void *dst, int offset) { // reading a sector of disk
 	outByte(0x1F7, 0x20);
 
 	waitDisk();
-	for (i = 0; i < SECTSIZE / 4; i ++) {
+	for (i = 0; i < SECTSIZE / 4; i++)
+	{
 		((int *)dst)[i] = inLong(0x1F0);
 	}
 }

@@ -11,13 +11,13 @@ that is TSS doesn't work
 
 .global irqEmpty
 irqEmpty:
-	pushl $0 // push dummy error code
-	pushl $-1 // push interruption number into kernel
+	pushl $0 # push dummy error code
+	pushl $-1 # push interruption number into kernel
 	jmp asmDoIrq
 
 .global irqErrorCode
 irqErrorCode:
-	pushl $-1 // push interruption number into kernel
+	pushl $-1 # push interruption number into kernel
 	jmp asmDoIrq
 
 .global irqDoubleFault
@@ -63,24 +63,24 @@ irqSecException:
 .global irqKeyboard
 irqKeyboard:
 	pushl $0
-			# TODO: 将irqKeyboard的中断向量号压入栈
+	pushl $0x21		# TODO: 将irqKeyboard的中断向量号压入栈
 	jmp asmDoIrq
 
 .global irqSyscall
 irqSyscall:
-	pushl $0 // push dummy error code
-	pushl $0x80 // push interruption number into kernel stack
+	pushl $0 # push dummy error code
+	pushl $0x80 # push interruption number into kernel stack
 	jmp asmDoIrq
 
-//.extern irqHandle //defined in irq_handle.c
+# .extern irqHandle # defined in irq_handle.c
 
 .global asmDoIrq
 asmDoIrq:
-	pushal // push process state into kernel stack
-	pushl %esp //esp is treated as a parameter
+	pushal # push process state into kernel stack
+	pushl %esp # esp is treated as a parameter
 	call irqHandle
-	addl $4, %esp //esp is on top of kernel stack
+	addl $4, %esp # esp is on top of kernel stack
 	popal
-	addl $4, %esp //interrupt number is on top of kernel stack
-	addl $4, %esp //error code is on top of kernel stack
+	addl $4, %esp # interrupt number is on top of kernel stack
+	addl $4, %esp # error code is on top of kernel stack
 	iret
